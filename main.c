@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+#ifdef _PHONEBOOK_H_orig
     /* build the entry */
     entry *pHead, *e;
     pHead = (entry *) malloc(sizeof(entry));
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
+
     clock_gettime(CLOCK_REALTIME, &start);
     while (fgets(line, sizeof(line), fp)) {
         while (line[i] != '\0')
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
+
     /* compute the execution time */
     clock_gettime(CLOCK_REALTIME, &start);
     findName(input, e);
@@ -84,6 +87,66 @@ int main(int argc, char *argv[])
 
     /* FIXME: release all allocated entries */
     free(pHead);
+#endif
 
+#ifdef _PHONEBOOK_H_opt
+    /* build the entry */
+    entry *pHead[MAX_LAST_NAME_SIZE];
+    entry *pLast[MAX_LAST_NAME_SIZE];
+    entry *e;
+    for(int i = 0; i < MAX_LAST_NAME_SIZE; i++) {
+        pHead[i] = (entry *) malloc(sizeof(entry));
+        e = pHead[i];
+        e->pNext = NULL;
+        pLast[i] = pHead[i];
+    }
+    printf("size of entry : %lu bytes\n", sizeof(entry));
+
+#if defined(__GNUC__)
+    for(int i; i < MAX_LAST_NAME_SIZE; i++)
+        __builtin___clear_cache((char *) pHead[i], (char *) pHead[i] + sizeof(entry));
+#endif
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    while (fgets(line, sizeof(line), fp)) {
+        while (line[i] != '\0')
+            i++;
+        line[i - 1] = '\0';
+        pLast[i] = append(line, pLast[i]);
+        i = 0;
+    }
+    clock_gettime(CLOCK_REALTIME, &end);
+    cpu_time1 = diff_in_second(start, end);
+
+    /* close file as soon as possible */
+    fclose(fp);
+
+    /* the givn last name to find */
+    char input[MAX_LAST_NAME_SIZE] = "zyxel";
+    int input_size = 6;
+    e = pHead[input_size];
+
+    assert(findName(input, e) &&
+           "Did you implement findName() in " IMPL "?");
+    assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
+
+#if defined(__GNUC__)
+    for(int i; i < MAX_LAST_NAME_SIZE; i++)
+        __builtin___clear_cache((char *) pHead[i], (char *) pHead[i] + sizeof(entry));
+#endif
+
+    /* compute the execution time */
+    clock_gettime(CLOCK_REALTIME, &start);
+    findName(input, e);
+    clock_gettime(CLOCK_REALTIME, &end);
+    cpu_time2 = diff_in_second(start, end);
+
+    printf("execution time of append() : %lf sec\n", cpu_time1);
+    printf("execution time of findName() : %lf sec\n", cpu_time2);
+
+    /* FIXME: release all allocated entries */
+    for(int i = 0; i < MAX_LAST_NAME_SIZE; i++)
+        free(pHead[i]);
+#endif
     return 0;
 }

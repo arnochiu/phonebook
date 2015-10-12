@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     printf("size of entry : %lu bytes\n", sizeof(entry));
 
 #if defined(__GNUC__)
-    for(int i; i < MAX_LAST_NAME_SIZE; i++)
+    for(int i = 0; i < MAX_LAST_NAME_SIZE; i++)
         __builtin___clear_cache((char *) pHead[i], (char *) pHead[i] + sizeof(entry));
 #endif
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
 
 #if defined(__GNUC__)
-    for(int i; i < MAX_LAST_NAME_SIZE; i++)
+    for(int i = 0; i < MAX_LAST_NAME_SIZE; i++)
         __builtin___clear_cache((char *) pHead[i], (char *) pHead[i] + sizeof(entry));
 #endif
 

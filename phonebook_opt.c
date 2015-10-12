@@ -5,7 +5,7 @@
 
 #include "phonebook_opt.h"
 
-int same(char *c1, char *c2){
+static inline int same(char *c1, char *c2){
     int i = 0;
     while(c1[i]==c2[i]){
         if(c1[i]=='\0' || c2[i]=='\0')

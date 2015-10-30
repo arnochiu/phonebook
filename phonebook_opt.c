@@ -39,3 +39,15 @@ entry *append(char lastName[], entry *e)
 
     return e;
 }
+
+void free_list(entry *pHead)
+{
+	entry *a, *b;
+	a = pHead;
+	b = pHead;
+	while(b!=NULL){
+		b = a->pNext;
+		free(a);
+		a = b;
+	}
+}

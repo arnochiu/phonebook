@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 
     /* FIXME: release all allocated entries */
     for(int i = 0; i < MAX_LAST_NAME_SIZE; i++)
-        free(pHead[i]);
+        free_list(pHead[i]);
 #endif
     return 0;
 }
